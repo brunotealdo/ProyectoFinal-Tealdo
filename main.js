@@ -10,28 +10,28 @@ const productosLista = [
     {
         id: 1,
         img: "producto1.jpg",
-        nombre: "Producto 1", 
+        nombre: "Aceitunas 100 gr", 
         precio: 56
         
     },
     {
         id: 2,
         img: "producto2.jpg",
-        nombre: "Producto 2", 
+        nombre: "Arvejas congeladas 250gr", 
         precio: 45
         
     },
     {
         id: 3,
         img: "producto3.jpg",
-        nombre: "Producto 3", 
+        nombre: "Mani a granel 100gr", 
         precio: 87
         
     },
     {
         id: 4,
         img: "producto4.jpg",
-        nombre: "Producto 4", 
+        nombre: "Palta por unidad", 
         precio: 30
         
     },
@@ -104,13 +104,13 @@ const actualizarCarrito = () =>{
     productosCarritoDom.innerHTML = ""
     Carrito.forEach(prod =>{
         productosCarritoDom.innerHTML += `
-            <div id="producto">
-                <h4>${prod.nombre}</h4>
+            <div id="productoCarrito">
+                <h3>${prod.nombre}</h3>
                 <p>$ ${prod.precio}</p>
                 <div class="cantidadCarrito">
+                    <button id="botonRestar" class="restarProducto">-</button>
                     <p>Cantidad: ${prod.cantidad} </p>
-                    <button class="restarProducto">-</button>
-                    <button class="sumarProducto">+</button>
+                    <button id="botonSumar" class="sumarProducto">+</button>
                 </div>
                 
             </div>
