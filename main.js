@@ -2,6 +2,12 @@ document.getElementById("carritoLogo").addEventListener("click", () =>{
     document.getElementById("Carrito").classList.toggle("active")
 })
 
+document.getElementById("vaciarCarrito").addEventListener("click", ()=>{
+        Swal.fire({
+            text: "Carrito vaciado!",
+            icon: "success"
+        })
+})
 
 
 let Carrito = JSON.parse(localStorage.getItem("Carrito")) || []
@@ -62,10 +68,13 @@ productosLista.forEach(prod => {
                                     <img src=${prod.img}>
                                     <h3>${prod.nombre}</h3>
                                     <p>$ <span>${prod.precio}</span></p>
-                                    <a class="btn">Agregar al carrito</a>
+                                    <a class="btn" id="agrega">Agregar al carrito</a>
                                 </div>`
 
 })
+
+
+
 const botonEliminar = () =>{
     const botonesRestar = document.getElementsByClassName("restarProducto")
     const ArrayBotonesRestar = Array.from(botonesRestar)
