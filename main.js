@@ -3,162 +3,241 @@ document.getElementById("carritoLogo").addEventListener("click", () =>{
 })
 
 document.getElementById("vaciarCarrito").addEventListener("click", ()=>{
+    
         Swal.fire({
             text: "Carrito vaciado!",
-            icon: "success"
+            icon: "success",
+            toast: true, 
+            showConfirmButton: false,
+            timer: 1500
+    
         })
+        
 })
 
 
 let Carrito = JSON.parse(localStorage.getItem("Carrito")) || []
 
-const productosLista = [
-    {
-        id: 1,
-        img: "producto1.jpg",
-        nombre: "Aceitunas 100 gr", 
-        precio: 56
-        
-    },
-    {
-        id: 2,
-        img: "producto2.jpg",
-        nombre: "Arvejas congeladas 250gr", 
-        precio: 45
-        
-    },
-    {
-        id: 3,
-        img: "producto3.jpg",
-        nombre: "Mani a granel 100gr", 
-        precio: 87
-        
-    },
-    {
-        id: 4,
-        img: "producto4.jpg",
-        nombre: "Palta por unidad", 
-        precio: 30
-        
-    },
-    {
-        id: 5,
-        img: "producto5.jpg",
-        nombre: "Producto 5", 
-        precio: 99
-        
-    },
-    {
-        id: 6,
-        img: "producto6.jpg",
-        nombre: "Producto 6", 
-        precio: 100
-        
-    }
-]
 
 const productosDom = document.getElementById("productos")
-const productosCarritoDom = document.getElementById("productosCarrito")
-const Total = document.getElementById("total")
+const carritoDom = document.getElementById("contenedorCarrito")
 const VaciarCarrito = document.getElementById("vaciarCarrito")
-
-
-productosLista.forEach(prod => {
-    productosDom.innerHTML += `<div class="producto">
-                                    <img src=${prod.img}>
-                                    <h3>${prod.nombre}</h3>
-                                    <p>$ <span>${prod.precio}</span></p>
-                                    <a class="btn" id="agrega">Agregar al carrito</a>
-                                </div>`
-
-})
+const comprar = document.getElementById("finalizarCompra")
+const totalDom = document.getElementById("total")
+const verMasDom = document.getElementById("verMas")
+let ultimoValor = 0
+let productosArray
 
 
 
-const botonEliminar = () =>{
-    const botonesRestar = document.getElementsByClassName("restarProducto")
-    const ArrayBotonesRestar = Array.from(botonesRestar)
+function actualizarCarrito(){
+    carritoDom.innerHTML = ""
 
-    ArrayBotonesRestar.forEach(prod =>{
-        prod.addEventListener("click", (e) =>{
-            let index = Carrito.findIndex(prod => prod.nombre == e.target.parentElement.parentElement.children[0].innerText)
-            let producto = Carrito[index]
-            if(producto.cantidad == 1){
+    localStorage.setItem("Carrito", JSON.stringify(Carrito))
+
+    Carrito.forEach(el => {
+        const {id, imagen, nombre, precio, cantidad} = el
+
+        const container = document.createElement("div")
+        container.classList.add("card-carrito")
+
+        const cantidadDom = document.createElement ("div")
+        cantidadDom.classList.add("cantDom")
+
+        const img = document.createElement("img")
+        const titulo = document.createElement("h3")
+        const precioDOM = document.createElement("p")
+
+        titulo.innerText = nombre
+        img.src = imagen
+        precioDOM.innerText = "$" + precio
+
+        img.classList.add("imagenCart")
+
+        const botonMas = document.createElement("button")
+        const botonMenos = document.createElement("button")
+        const cantidadTexto = document.createElement("p")
+
+        botonMas.innerText = "+"
+        botonMenos.innerText = "-"
+        cantidadTexto.innerText = cantidad
+
+        botonMas.classList.add("btnCart")
+        botonMenos.classList.add("btnCart")
+
+
+        botonMas.addEventListener("click", ()=>{
+            let index = Carrito.findIndex(el => el.id == id)
+        
+            Carrito[index].cantidad += 1
+            actualizarCarrito()   
+        })
+
+        botonMenos.addEventListener("click", ()=>{
+            let index = Carrito.findIndex(el => el.id == id)
+            
+            if(Carrito[index].cantidad == 1){
+                
                 Carrito.splice(index, 1)
             }else{
-                producto.cantidad -= 1
+                Carrito[index].cantidad -= 1
             }
             actualizarCarrito()
         })
+
+        container.append(img, titulo)
+        cantidadDom.append(precioDOM, botonMenos,  cantidadTexto, botonMas)
+        carritoDom.append(container, cantidadDom)
     })
-}
-
-const botonSumar = () =>{
-    const botonesSumar = document.getElementsByClassName("sumarProducto")
-    const ArrayBotonesSumar = Array.from(botonesSumar)
-
-    ArrayBotonesSumar.forEach(prod =>{
-        prod.addEventListener("click", (e) =>{
-            let index = Carrito.findIndex(prod => prod.nombre == e.target.parentElement.parentElement.children[0].innerText)
-            let producto = Carrito[index]
-            producto.cantidad += 1
-            actualizarCarrito()
-        })
-    })
-}
-
-
-
-const actualizarCarrito = () =>{
-    productosCarritoDom.innerHTML = ""
-    Carrito.forEach(prod =>{
-        productosCarritoDom.innerHTML += `
-            <div id="productoCarrito">
-                <h3>${prod.nombre}</h3>
-                <p>$ ${prod.precio}</p>
-                <div class="cantidadCarrito">
-                    <button id="botonRestar" class="restarProducto">-</button>
-                    <p>Cantidad: ${prod.cantidad} </p>
-                    <button id="botonSumar" class="sumarProducto">+</button>
-                </div>
-                
-            </div>
-        `
-    })
-    
-    
-    Total.innerText = "Total: $ " + Carrito.reduce((acc, prod) =>{
-        return acc + prod.precio * prod.cantidad
+    totalDom.innerText = "Total: $ " + Carrito.reduce((acc, el) =>{
+        return acc + el.precio * el.cantidad
     }, 0)
-    botonEliminar()
-    botonSumar()
-    localStorage.setItem("Carrito", JSON.stringify(Carrito))
+    
+   
 }
 
 
-const botones = document.getElementsByClassName("btn")
-const ArrayBotones = Array.from(botones)
 
-ArrayBotones.forEach(prod => {
-    prod.addEventListener("click", (event)=>{
-        let producto = Carrito.find(prod => prod.nombre == event.target.parentElement.children[1].innerText)
-        if(producto){
-            producto.cantidad += 1
-        }else{
-            Carrito.push({
-                nombre: event.target.parentElement.children[1].innerText,
-                cantidad: 1,
-                precio: Number(event.target.parentElement.children[2].children[0].innerText)
-            })
-        }
-        
-        actualizarCarrito()
-    })
-})
+
+
 VaciarCarrito.addEventListener("click", ()=>{
     Carrito = []
     actualizarCarrito()
 })
-document.addEventListener("DOMContentLoaded", () =>{
+
+
+
+function creadoraDeCards({id, nombre, precio, imagen}){
+    
+    const container = document.createElement("div")
+    container.classList.add("producto")
+
+    const img = document.createElement("img")
+    const titulo = document.createElement("h2")
+    const precioDOM = document.createElement("p")
+    const boton = document.createElement("button")
+
+    boton.classList.add("btn")
+
+    img.src = imagen
+    titulo.innerText = nombre
+    precioDOM.innerText = "$" + precio
+    precioDOM.classList.add("precioProd")
+    img.classList.add("imagenProd")
+
+    boton.innerText = "Agregar al carrito"
+
+    container.append(img, titulo, precioDOM, boton)
+
+    boton.addEventListener("click", () =>{
+        let index = Carrito.findIndex(el => el.id == id)
+        
+        if(index == -1){
+            Carrito.push({
+                id,
+                imagen,
+                nombre,
+                precio, 
+                cantidad: 1
+
+            })
+        }else(
+            Carrito[index].cantidad += 1
+        )
+
+        actualizarCarrito()
+
+        Swal.fire({
+            title: nombre + " agregado al carrito",
+            timer : 1000,
+            showConfirmButton: false,  
+            toast: true,
+            position: "bottom-start",
+            background: "#91B882",
+            color: "#fff",
+            iconColor: "#fff",
+            padding: "0"
+        })
+    })
+
+    productosDom.appendChild(container)
+}
+comprar.addEventListener("click", ()=>{
+    let total = Carrito.reduce((acc, el) =>{
+        return acc + el.precio * el.cantidad 
+
+    }, 0)
+
+    if (total == 0){
+        Swal.fire({
+            title: "Su carrito está vacío",
+            confirmButtonText: "Seguir comprando",
+            confirmButtonColor:  "#91b882",
+        })
+    }else{
+        Swal.fire({
+            title: "El total de su compra es: $ " + total,
+            showCancelButton: true,
+            cancelButtonText: "Seguir comprando",
+            confirmButtonColor:  "#91b882",
+            confirmButtonText: "Comprar"
+        }).then((result) =>{
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: "¡Gracias por su compra!\n Ingrese su email",
+                    input: "email",
+                    confirmButtonColor:  "#91b882"
+                }).then((result) =>{
+                    Swal.fire({
+                        title: "Su pedido está en camino!",
+                        showConfirmButton: false,
+                        timer: 2000
+                    })
+                    Carrito = []
+                    actualizarCarrito()
+                })
+            }else if (result.isDenied){
+                return
+            }
+        })
+    }
+})
+
+verMasDom.addEventListener("click", (e) =>{
+    let aux = ultimoValor + 1
+
+    if (aux >= productosArray.length){
+        e.target.innerText = "No hay mas productos para mostrar"
+        return
+    }
+
+    if(ultimoValor + 5 > productosArray.length){
+        for (let i = aux; i <= aux + 5; i++) {
+            creadoraDeCards(productosArray[i])
+            ultimoValor = i
+        }
+
+    }else{
+        for(let i = aux; i <= aux + 5; i++){
+            creadoraDeCards(productosArray[i])
+            ultimoValor = i
+        }
+    }
+
+})
+
+document.addEventListener("DOMContentLoaded", async () =>{
+    const response = await fetch('data.json')
+    const data = await response.json()
+
+    productosArray = data
+    
+    for (let i = 0; i <= 5; i++) {
+        creadoraDeCards(productosArray[i])
+        ultimoValor = i
+    }
+
+    
     actualizarCarrito()
 })
+
