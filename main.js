@@ -227,17 +227,23 @@ verMasDom.addEventListener("click", (e) =>{
 })
 
 document.addEventListener("DOMContentLoaded", async () =>{
-    const response = await fetch('data.json')
-    const data = await response.json()
+    try {
+        const response = await fetch('data.json')
 
-    productosArray = data
+        if(!response.ok){
+            throw new Error ("La respuesta no fue aceptada")
+        }
+        const data = await response.json()
     
-    for (let i = 0; i <= 5; i++) {
-        creadoraDeCards(productosArray[i])
-        ultimoValor = i
+        productosArray = data
+        
+        for (let i = 0; i <= 5; i++) {
+            creadoraDeCards(productosArray[i])
+            ultimoValor = i
+        }
+        actualizarCarrito()
+    } catch (error) {
+        console.error(error)
     }
-
-    
-    actualizarCarrito()
 })
 
